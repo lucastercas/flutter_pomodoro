@@ -97,6 +97,9 @@ class _ClockState extends State<Clock> {
   @override
   Widget build(BuildContext context) {
     return RawMaterialButton(
+      onPressed: () {
+        this.timer.isActive ? this.timer.cancel() : this._startTimer();
+      },
       shape: CircleBorder(),
       fillColor: kAccentColor,
       child: Padding(

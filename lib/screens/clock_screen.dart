@@ -27,25 +27,17 @@ class _ClockScreen extends State<ClockScreen> {
         await Firestore.instance.collection('timers').document(docName).get();
     Map data = docSnap.data;
 
-    print(data);
     data.update(
       this.activityName,
-      (dynamic val) {
-        var newData = {
-          'distractions': val['distractions'],
-          'iterations': ++val['iterations']
-        };
-        return newData;
+      (dynamic val) => {
+        'distractions': val['distractions'],
+        'iterations': ++val['iterations']
       },
-      ifAbsent: () {
-        print('It Is Absent');
-        return {
-          'distractions': this.distractions,
-          'iterations': this.iterations,
-        };
+      ifAbsent: () => {
+        'distractions': this.distractions,
+        'iterations': this.iterations,
       },
     );
-    print(data);
 
     Firestore.instance.collection('timers').document(docName).setData(data);
   }

@@ -21,6 +21,15 @@ class _StartScreen extends State<StartScreen> {
   int seconds = 5;
   String buttonText = 'Change to Rest';
   PomodoroState state = PomodoroState.work;
+  String activityName;
+
+  final textController = TextEditingController();
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +44,33 @@ class _StartScreen extends State<StartScreen> {
             PlayButton(
               text: "${this.minutes}:${'0' + this.seconds.toString()}",
               onTap: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/clock_screen',
-                  arguments: ClockScreenArguments(
-                    minutes: this.minutes,
-                    seconds: this.seconds,
-                    activityName: 'una-sus',
-                  ),
+                showDialog(
+                  context: this.context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Start Time"),
+                      content: TextField(
+                        controller: this.textController,
+                      ),
+                      actions: <Widget>[
+                        RaisedButton(
+                          color: kAccentColor,
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              '/clock_screen',
+                              arguments: ClockScreenArguments(
+                                minutes: this.minutes,
+                                seconds: this.seconds,
+                                activityName: this.textController.text,
+                              ),
+                            );
+                          },
+                          child: Text("Start"),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
             ),
