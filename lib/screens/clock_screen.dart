@@ -13,12 +13,12 @@ class ClockScreen extends StatefulWidget {
 }
 
 class _ClockScreen extends State<ClockScreen> {
-  int minutes;
-  int seconds;
-  int distractions = 0;
   String activityName;
+  PomodoroState state;
+
+  int distractions = 0;
   int iterations = 0;
-  Widget clock = null;
+  Widget clock;
 
   void _updateDatabase() async {
     DateTime date = DateTime.now();
@@ -45,8 +45,11 @@ class _ClockScreen extends State<ClockScreen> {
   void _onClockEnd() {
     this.iterations++;
     this._updateDatabase();
+    _showEndDialog();
+  }
+
+  void _showEndDialog() {
     showDialog(
-      barrierDismissible: false,
       context: this.context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -54,17 +57,30 @@ class _ClockScreen extends State<ClockScreen> {
           actions: <Widget>[
             RaisedButton(
               color: kAccentColor,
-              child: Text('Go Back'),
+              child: Text('Focus'),
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/');
+                setState(() {
+                  this.clock = _buildClock(pomState: PomodoroState.focus);
+                });
+                Navigator.of(context).pop();
               },
             ),
             RaisedButton(
               color: kAccentColor,
-              child: Text('Start Again'),
+              child: Text('Short Pause'),
               onPressed: () {
                 setState(() {
-                  this.clock = _buildClock();
+                  this.clock = _buildClock(pomState: PomodoroState.shortRest);
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            RaisedButton(
+              color: kAccentColor,
+              child: Text('Long Pause'),
+              onPressed: () {
+                setState(() {
+                  this.clock = _buildClock(pomState: PomodoroState.longRest);
                 });
                 Navigator.of(context).pop();
               },
@@ -75,10 +91,10 @@ class _ClockScreen extends State<ClockScreen> {
     );
   }
 
-  Clock _buildClock() {
+  Clock _buildClock({PomodoroState pomState}) {
+    print(pomState);
     Clock newClock = new Clock(
-      minutes: this.minutes,
-      seconds: this.seconds,
+      state: pomState != null ? pomState : this.state,
       updateIterations: () {
         setState(() {
           this.iterations++;
@@ -94,8 +110,7 @@ class _ClockScreen extends State<ClockScreen> {
   void _getInitialArguments() {
     final ClockScreenArguments arguments =
         ModalRoute.of(context).settings.arguments;
-    this.minutes = arguments.minutes;
-    this.seconds = arguments.seconds;
+    this.state = arguments.state;
     this.activityName = arguments.activityName;
   }
 

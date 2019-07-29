@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_flutter/constants.dart';
 
 class BotAppBar extends StatelessWidget {
-  const BotAppBar({
-    Key key,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
@@ -15,7 +11,9 @@ class BotAppBar extends StatelessWidget {
           Expanded(
             child: Container(
               child: FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/');
+                },
                 child: Text('Pomodoro'),
               ),
             ),
@@ -23,7 +21,9 @@ class BotAppBar extends StatelessWidget {
           Expanded(
             child: Container(
               child: FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/todo_screen');
+                },
                 child: Text('To Do'),
               ),
             ),

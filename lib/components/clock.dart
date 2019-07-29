@@ -4,46 +4,24 @@ import 'dart:async';
 import 'package:pomodoro_flutter/constants.dart';
 
 class Clock extends StatefulWidget {
-  final int minutes;
-  final int seconds;
+  final PomodoroState state;
   final Function updateIterations;
   final Function onClockEnd;
 
   Clock({
-    @required this.minutes,
-    @required this.seconds,
+    @required this.state,
     @required this.updateIterations,
     @required this.onClockEnd,
   });
 
-  void reset() {
-    this.createState();
-  }
-
   @override
-  _ClockState createState() => _ClockState(
-      minutes: this.minutes,
-      seconds: this.seconds,
-      updateIterations: this.updateIterations,
-      onClockEnd: this.onClockEnd);
+  _ClockState createState() => _ClockState();
 }
 
 class _ClockState extends State<Clock> {
   int minutes;
   int seconds;
-  int initialMinutes;
-  int initialSeconds;
-  Function updateIterations;
-  Function onClockEnd;
-
   Timer timer;
-
-  _ClockState({
-    @required this.minutes,
-    @required this.seconds,
-    @required this.updateIterations,
-    @required this.onClockEnd,
-  });
 
   void _startTimer() {
     this.timer = Timer.periodic(
@@ -55,7 +33,7 @@ class _ClockState extends State<Clock> {
   void _getCurrentTime() {
     if (this.seconds == 0 && this.minutes == 0) {
       this.timer.cancel();
-      this.onClockEnd();
+      widget.onClockEnd();
       return;
     }
     setState(() {
@@ -69,36 +47,44 @@ class _ClockState extends State<Clock> {
   }
 
   void _initClock() {
-    this.minutes = this.initialMinutes;
-    this.seconds = this.initialSeconds;
+    this.minutes = pomodoroSettings[widget.state]['minutes'];
+    this.seconds = pomodoroSettings[widget.state]['seconds'];
     this._startTimer();
   }
 
   @override
   void didUpdateWidget(Widget oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    print('Updating Clock');
     this._initClock();
+    print(widget.state);
+
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
   void initState() {
-    super.initState();
-    this.initialMinutes = this.minutes;
-    this.initialSeconds = this.seconds;
+    // TODO: pq da erro se eu chamar _initClock aqui?
+    this.minutes = pomodoroSettings[widget.state]['minutes'];
+    this.seconds = pomodoroSettings[widget.state]['seconds'];
     this._startTimer();
+    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     this.timer.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return RawMaterialButton(
       onPressed: () {
-        this.timer.isActive ? this.timer.cancel() : this._startTimer();
+        if (this.minutes == 0 && this.seconds == 0) {
+          widget.onClockEnd();
+        } else {
+          this.timer.isActive ? this.timer.cancel() : this._startTimer();
+        }
       },
       shape: CircleBorder(),
       fillColor: kAccentColor,
