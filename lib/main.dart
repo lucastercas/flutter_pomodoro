@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro_flutter/constants.dart';
 import 'package:pomodoro_flutter/screens/clock_screen.dart';
 import 'package:pomodoro_flutter/screens/start_screen.dart';
+import 'package:pomodoro_flutter/screens/todo_start_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (BuildContext context) => StartScreen(),
-        '/clock_screen': (BuildContext context) => ClockScreen()
+        '/clock_screen': (BuildContext context) => ClockScreen(),
+        '/todo_screen': (BuildContext context) => ToDoScreen(),
       },
     );
   }
