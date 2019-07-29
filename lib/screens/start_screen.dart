@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:pomodoro_flutter/components/clock_screen_arguments.dart';
 import 'package:pomodoro_flutter/components/play_button.dart';
@@ -23,22 +22,6 @@ class _StartScreen extends State<StartScreen> {
   String buttonText = 'Change to Rest';
   PomodoroState state = PomodoroState.work;
 
-/*
-  @override
-  void initState() {
-    super.initState();
-    var data = {
-      'title': 'iae',
-      'author': 'test',
-    };
-    try {
-      Firestore.instance.collection('timers').document().setData(data);
-    } catch (e) {
-      print(e);
-    }
-  }
-  */
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,9 +39,10 @@ class _StartScreen extends State<StartScreen> {
                   context,
                   '/clock_screen',
                   arguments: ClockScreenArguments(
-                      minutes: this.minutes,
-                      seconds: this.seconds,
-                      activityName: 'una-sus'),
+                    minutes: this.minutes,
+                    seconds: this.seconds,
+                    activityName: 'una-sus',
+                  ),
                 );
               },
             ),
