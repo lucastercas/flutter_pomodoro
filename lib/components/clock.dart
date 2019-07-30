@@ -52,6 +52,8 @@ class _ClockState extends State<Clock> {
           this.seconds = 59;
         }
       });
+    } else {
+      this.timer.cancel();
     }
   }
 
