@@ -4,46 +4,31 @@ import 'dart:async';
 import 'package:pomodoro_flutter/constants.dart';
 
 class Clock extends StatefulWidget {
-  final int minutes;
-  final int seconds;
   final Function updateIterations;
   final Function onClockEnd;
+  final PomodoroState state;
 
   Clock({
-    @required this.minutes,
-    @required this.seconds,
+    @required this.state,
     @required this.updateIterations,
     @required this.onClockEnd,
   });
 
-  void reset() {
-    this.createState();
-  }
-
   @override
-  _ClockState createState() => _ClockState(
-      minutes: this.minutes,
-      seconds: this.seconds,
-      updateIterations: this.updateIterations,
-      onClockEnd: this.onClockEnd);
+  _ClockState createState() {
+    int minutes = pomodoroSettings[this.state]['minutes'];
+    int seconds = pomodoroSettings[this.state]['seconds'];
+    return _ClockState(minutes: minutes, seconds: seconds);
+  }
 }
 
 class _ClockState extends State<Clock> {
   int minutes;
   int seconds;
-  int initialMinutes;
-  int initialSeconds;
-  Function updateIterations;
-  Function onClockEnd;
 
   Timer timer;
 
-  _ClockState({
-    @required this.minutes,
-    @required this.seconds,
-    @required this.updateIterations,
-    @required this.onClockEnd,
-  });
+  _ClockState({@required this.minutes, @required this.seconds});
 
   void _startTimer() {
     this.timer = Timer.periodic(
@@ -55,22 +40,30 @@ class _ClockState extends State<Clock> {
   void _getCurrentTime() {
     if (this.seconds == 0 && this.minutes == 0) {
       this.timer.cancel();
-      this.onClockEnd();
+      widget.onClockEnd();
       return;
     }
-    setState(() {
-      if (this.seconds > 0) {
-        this.seconds--;
-      } else {
-        this.minutes--;
-        this.seconds = 59;
-      }
-    });
+    if (this.mounted) {
+      setState(() {
+        if (this.seconds > 0) {
+          this.seconds--;
+        } else {
+          this.minutes--;
+          this.seconds = 59;
+        }
+      });
+    }
   }
 
   void _initClock() {
-    this.minutes = this.initialMinutes;
-    this.seconds = this.initialSeconds;
+    this.minutes = pomodoroSettings[widget.state]['minutes'];
+    this.seconds = pomodoroSettings[widget.state]['seconds'];
+    this._startTimer();
+  }
+
+  @override
+  void initState() {
+    super.initState();
     this._startTimer();
   }
 
@@ -78,14 +71,6 @@ class _ClockState extends State<Clock> {
   void didUpdateWidget(Widget oldWidget) {
     super.didUpdateWidget(oldWidget);
     this._initClock();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    this.initialMinutes = this.minutes;
-    this.initialSeconds = this.seconds;
-    this._startTimer();
   }
 
   @override

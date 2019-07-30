@@ -9,13 +9,34 @@ const kRestTime = 0;
 const kAccentColor = Color(0xff1d2021);
 
 const kLabelTextStyle = TextStyle(
-  fontSize: 25.0,
+  fontSize: 20.0,
   fontWeight: FontWeight.bold,
-  color: kForegroundColor
+  color: kForegroundColor,
 );
 
 const kClockTextStyle = TextStyle(
   fontSize: 75.0,
   fontWeight: FontWeight.bold,
-  color: kForegroundColor
+  color: kForegroundColor,
 );
+
+enum PomodoroState {
+  focus,
+  shortPause,
+  longPause,
+}
+
+const pomodoroSettings = {
+  PomodoroState.focus: {
+    'minutes': 0,
+    'seconds': 3,
+  },
+  PomodoroState.longPause: {
+    'minutes': 15,
+    'seconds': 0,
+  },
+  PomodoroState.shortPause: {
+    'minutes': 5,
+    'seconds': 0,
+  }
+};

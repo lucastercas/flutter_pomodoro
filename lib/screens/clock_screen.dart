@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pomodoro_flutter/constants.dart';
 import 'package:pomodoro_flutter/components/clock_screen_arguments.dart';
 import 'package:pomodoro_flutter/components/clock.dart';
+import 'package:pomodoro_flutter/components/dialog_action_button.dart';
 import 'package:pomodoro_flutter/components/bot_app_bar.dart';
 
 class ClockScreen extends StatefulWidget {
@@ -13,62 +14,100 @@ class ClockScreen extends StatefulWidget {
 }
 
 class _ClockScreen extends State<ClockScreen> {
-  int minutes;
-  int seconds;
+  PomodoroState state;
+
   int distractions = 0;
   String activityName;
   int iterations = 0;
-  Widget clock = null;
+  Widget clock;
 
   void _updateDatabase() async {
     DateTime date = DateTime.now();
     String docName = "${date.year}-${date.month}-${date.day}";
-    DocumentSnapshot docSnap =
-        await Firestore.instance.collection('timers').document(docName).get();
-    Map data = docSnap.data;
 
-    data.update(
-      this.activityName,
-      (dynamic val) => {
-        'distractions': val['distractions'],
-        'iterations': ++val['iterations']
-      },
-      ifAbsent: () => {
-        'distractions': this.distractions,
-        'iterations': this.iterations,
-      },
-    );
+    DocumentReference docRef =
+        Firestore.instance.collection('timers').document(docName);
+    DocumentSnapshot docSnap = await docRef.get();
 
-    Firestore.instance.collection('timers').document(docName).setData(data);
+    if (docSnap == null) {
+      print('Document Not Found');
+      return;
+    }
+
+    try {
+      Map data = docSnap.data;
+      if (data == null) {
+        print('Data Not Found');
+        docRef.setData({
+          activityName: {
+            'distractions': this.distractions,
+            'iterations': 1,
+          }
+        });
+        return;
+      }
+
+      data.update(
+        this.activityName,
+        (dynamic val) => {
+          'distractions': val['distractions'],
+          'iterations': ++val['iterations']
+        },
+        ifAbsent: () => {
+          'distractions': this.distractions,
+          'iterations': this.iterations,
+        },
+      );
+      docRef.setData(data);
+    } catch (e) {
+      print(e);
+    }
   }
 
   void _onClockEnd() {
     this.iterations++;
-    this._updateDatabase();
+    _updateDatabase();
+    _showDialog();
+  }
+
+  void _showDialog() {
     showDialog(
-      barrierDismissible: false,
       context: this.context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Timer End'),
           actions: <Widget>[
-            RaisedButton(
-              color: kAccentColor,
-              child: Text('Go Back'),
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/');
-              },
-            ),
-            RaisedButton(
-              color: kAccentColor,
-              child: Text('Start Again'),
+            DialogActionButton(
+              text: 'Focus',
               onPressed: () {
                 setState(() {
+                  this.state = PomodoroState.focus;
+                  this.clock = null;
+                  Navigator.of(context).pop();
                   this.clock = _buildClock();
                 });
-                Navigator.of(context).pop();
               },
             ),
+            DialogActionButton(
+              text: 'Short',
+              onPressed: () {
+                setState(() {
+                  this.state = PomodoroState.shortPause;
+                  this.clock = null;
+                  Navigator.of(context).pop();
+                  this.clock = _buildClock();
+                });
+              },
+            ),
+            DialogActionButton(
+              text: 'Long',
+              onPressed: () {
+                setState(() {
+                  this.state = PomodoroState.longPause;
+                  this.clock = null;
+                });
+              },
+            )
           ],
         );
       },
@@ -77,8 +116,7 @@ class _ClockScreen extends State<ClockScreen> {
 
   Clock _buildClock() {
     Clock newClock = new Clock(
-      minutes: this.minutes,
-      seconds: this.seconds,
+      state: this.state,
       updateIterations: () {
         setState(() {
           this.iterations++;
@@ -94,14 +132,8 @@ class _ClockScreen extends State<ClockScreen> {
   void _getInitialArguments() {
     final ClockScreenArguments arguments =
         ModalRoute.of(context).settings.arguments;
-    this.minutes = arguments.minutes;
-    this.seconds = arguments.seconds;
+    this.state = arguments.state;
     this.activityName = arguments.activityName;
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -121,10 +153,6 @@ class _ClockScreen extends State<ClockScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Distractions: ${this.distractions}',
-              style: kLabelTextStyle,
-            ),
             Container(
               margin: EdgeInsets.only(top: 20.0, bottom: 20.0),
               child: this.clock,
@@ -141,7 +169,11 @@ class _ClockScreen extends State<ClockScreen> {
                 'Cancel Timer',
                 style: kLabelTextStyle,
               ),
-            )
+            ),
+            Text(
+              'Distractions: ${this.distractions}',
+              style: kLabelTextStyle,
+            ),
           ],
         ),
       ),
