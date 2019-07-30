@@ -18,6 +18,7 @@ class _ClockScreen extends State<ClockScreen> {
 
   int distractions = 0;
   String activityName;
+
   int iterations = 0;
   Widget clock;
 
@@ -114,7 +115,8 @@ class _ClockScreen extends State<ClockScreen> {
     );
   }
 
-  Clock _buildClock() {
+  Clock _buildClock({PomodoroState pomState}) {
+    print(pomState);
     Clock newClock = new Clock(
       state: this.state,
       updateIterations: () {

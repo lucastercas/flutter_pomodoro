@@ -65,6 +65,7 @@ class _ClockState extends State<Clock> {
   void initState() {
     super.initState();
     this._startTimer();
+    super.initState();
   }
 
   @override
@@ -75,15 +76,19 @@ class _ClockState extends State<Clock> {
 
   @override
   void dispose() {
-    super.dispose();
     this.timer.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return RawMaterialButton(
       onPressed: () {
-        this.timer.isActive ? this.timer.cancel() : this._startTimer();
+        if (this.minutes == 0 && this.seconds == 0) {
+          widget.onClockEnd();
+        } else {
+          this.timer.isActive ? this.timer.cancel() : this._startTimer();
+        }
       },
       shape: CircleBorder(),
       fillColor: kAccentColor,

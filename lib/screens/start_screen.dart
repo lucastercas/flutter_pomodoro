@@ -48,6 +48,7 @@ class _StartScreen extends State<StartScreen> {
                       actions: <Widget>[
                         DialogActionButton(
                           onPressed: () {
+                            Navigator.of(context, rootNavigator: true).pop();
                             Navigator.pushReplacementNamed(
                               context,
                               '/clock_screen',
