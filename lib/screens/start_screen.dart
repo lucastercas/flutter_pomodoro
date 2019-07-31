@@ -4,9 +4,10 @@ import 'package:pomodoro_flutter/components/clock_screen_arguments.dart';
 import 'package:pomodoro_flutter/components/dialog_action_button.dart';
 import 'package:pomodoro_flutter/components/play_button.dart';
 import 'package:pomodoro_flutter/constants.dart';
-import 'package:pomodoro_flutter/components/bot_app_bar.dart';
 
 class StartScreen extends StatefulWidget {
+  StartScreen({Key key}) : super(key: key);
+
   @override
   _StartScreen createState() => _StartScreen();
 }
@@ -49,9 +50,9 @@ class _StartScreen extends State<StartScreen> {
                         DialogActionButton(
                           onPressed: () {
                             Navigator.of(context, rootNavigator: true).pop();
-                            Navigator.pushReplacementNamed(
+                            Navigator.pushNamed(
                               context,
-                              '/clock_screen',
+                              'clock_screen',
                               arguments: ClockScreenArguments(
                                 state: this.state,
                                 activityName: this.textController.text,
@@ -99,7 +100,6 @@ class _StartScreen extends State<StartScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BotAppBar(),
     );
   }
 }

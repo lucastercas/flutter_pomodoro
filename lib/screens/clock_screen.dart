@@ -6,7 +6,6 @@ import 'package:pomodoro_flutter/constants.dart';
 import 'package:pomodoro_flutter/components/clock_screen_arguments.dart';
 import 'package:pomodoro_flutter/components/clock.dart';
 import 'package:pomodoro_flutter/components/dialog_action_button.dart';
-import 'package:pomodoro_flutter/components/bot_app_bar.dart';
 
 class ClockScreen extends StatefulWidget {
   @override
@@ -161,7 +160,7 @@ class _ClockScreen extends State<ClockScreen> {
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pop(context);
               },
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
@@ -189,7 +188,6 @@ class _ClockScreen extends State<ClockScreen> {
         backgroundColor: kAccentColor,
         foregroundColor: kForegroundColor,
       ),
-      bottomNavigationBar: BotAppBar(),
     );
   }
 }
